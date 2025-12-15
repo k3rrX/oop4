@@ -3,300 +3,185 @@
 
 using namespace std;
 
-#define PI_CHISLO 3.141592653589793
+double const_pi = 3.14159265358979323846;
 
-// точка
-class tochka_dvum {
+class point {
 public:
-    double xx;
-    double yy;
+    double a;
+    double b;
     
-    tochka_dvum() {
-        xx = 0;
-        yy = 0;
+    point() {
+        a = 0;
+        b = 0;
     }
     
-    tochka_dvum(double x1, double y1) {
-        xx = x1;
-        yy = y1;
-    }
-    
-    void pokazat() {
-        cout << "(" << xx << "," << yy << ")";
+    point(double x, double y) {
+        a = x;
+        b = y;
     }
 };
 
-// 5 угольник
-class figura_5 {
+class five_shape {
 public:
-    tochka_dvum centr_toch;
-    double razmer_r;
-    tochka_dvum massiv_toch[5];
+    point center_point;
+    double radius_value;
+    point points_array[5];
     
-    figura_5() {
-        centr_toch = tochka_dvum(0, 0);
-        razmer_r = 0;
-        raschet_toch();
+    five_shape() {
+        center_point = point(0, 0);
+        radius_value = 0;
+        calculate_points();
     }
     
-    figura_5(double cx, double cy, double r) {
-        centr_toch = tochka_dvum(cx, cy);
-        razmer_r = r;
-        raschet_toch();
+    five_shape(double x, double y, double r) {
+        center_point = point(x, y);
+        radius_value = r;
+        calculate_points();
     }
     
-    void raschet_toch() {
-        for(int i = 0; i < 5; i++) {
-            double ugol = 2.0 * PI_CHISLO * i / 5.0;
-            massiv_toch[i].xx = centr_toch.xx + razmer_r * cos(ugol);
-            massiv_toch[i].yy = centr_toch.yy + razmer_r * sin(ugol);
+    void calculate_points() {
+        for (int i = 0; i < 5; i++) {
+            double angle = 2.0 * const_pi * i / 5.0;
+            points_array[i].a = center_point.a + radius_value * cos(angle);
+            points_array[i].b = center_point.b + radius_value * sin(angle);
         }
     }
     
-    void pokazat_tochki() {
-        cout << "5 ugol: ";
-        for(int i = 0; i < 5; i++) {
-            massiv_toch[i].pokazat();
-            cout << " ";
+    double get_area() {
+        return 0.25 * sqrt(5.0 * (5.0 + 2.0 * sqrt(5.0))) * radius_value * radius_value;
+    }
+    
+    void show() {
+        cout << "Five shape points: ";
+        for (int i = 0; i < 5; i++) {
+            cout << "(" << points_array[i].a << "," << points_array[i].b << ") ";
         }
-    }
-    
-    tochka_dvum centr_fig() {
-        return centr_toch;
-    }
-    
-    double ploshad_fig() {
-        return 0.25 * sqrt(5.0 * (5.0 + 2.0 * sqrt(5.0))) * razmer_r * razmer_r;
-    }
-    
-    void prochitat_s_klav() {
-        cout << "Vvedite 3 chisla: ";
-        cin >> centr_toch.xx >> centr_toch.yy >> razmer_r;
-        raschet_toch();
+        cout << endl;
     }
 };
 
-// 6 угольник  
-class figura_6 {
+class six_shape {
 public:
-    tochka_dvum centr_toch;
-    double razmer_r;
-    tochka_dvum massiv_toch[6];
+    point center_point;
+    double radius_value;
+    point points_array[6];
     
-    figura_6() {
-        centr_toch = tochka_dvum(0, 0);
-        razmer_r = 0;
-        raschet_toch();
+    six_shape() {
+        center_point = point(0, 0);
+        radius_value = 0;
+        calculate_points();
     }
     
-    figura_6(double cx, double cy, double r) {
-        centr_toch = tochka_dvum(cx, cy);
-        razmer_r = r;
-        raschet_toch();
+    six_shape(double x, double y, double r) {
+        center_point = point(x, y);
+        radius_value = r;
+        calculate_points();
     }
     
-    void raschet_toch() {
-        for(int i = 0; i < 6; i++) {
-            double ugol = 2.0 * PI_CHISLO * i / 6.0;
-            massiv_toch[i].xx = centr_toch.xx + razmer_r * cos(ugol);
-            massiv_toch[i].yy = centr_toch.yy + razmer_r * sin(ugol);
+    void calculate_points() {
+        for (int i = 0; i < 6; i++) {
+            double angle = 2.0 * const_pi * i / 6.0;
+            points_array[i].a = center_point.a + radius_value * cos(angle);
+            points_array[i].b = center_point.b + radius_value * sin(angle);
         }
     }
     
-    void pokazat_tochki() {
-        cout << "6 ugol: ";
-        for(int i = 0; i < 6; i++) {
-            massiv_toch[i].pokazat();
-            cout << " ";
+    double get_area() {
+        return 1.5 * sqrt(3.0) * radius_value * radius_value;
+    }
+    
+    void show() {
+        cout << "Six shape points: ";
+        for (int i = 0; i < 6; i++) {
+            cout << "(" << points_array[i].a << "," << points_array[i].b << ") ";
         }
-    }
-    
-    tochka_dvum centr_fig() {
-        return centr_toch;
-    }
-    
-    double ploshad_fig() {
-        return 1.5 * sqrt(3.0) * razmer_r * razmer_r;
+        cout << endl;
     }
 };
 
-// 8 угольник
-class figura_8 {
+class eight_shape {
 public:
-    tochka_dvum centr_toch;
-    double razmer_r;
-    tochka_dvum massiv_toch[8];
+    point center_point;
+    double radius_value;
+    point points_array[8];
     
-    figura_8() {
-        centr_toch = tochka_dvum(0, 0);
-        razmer_r = 0;
-        raschet_toch();
+    eight_shape() {
+        center_point = point(0, 0);
+        radius_value = 0;
+        calculate_points();
     }
     
-    figura_8(double cx, double cy, double r) {
-        centr_toch = tochka_dvum(cx, cy);
-        razmer_r = r;
-        raschet_toch();
+    eight_shape(double x, double y, double r) {
+        center_point = point(x, y);
+        radius_value = r;
+        calculate_points();
     }
     
-    void raschet_toch() {
-        for(int i = 0; i < 8; i++) {
-            double ugol = 2.0 * PI_CHISLO * i / 8.0;
-            massiv_toch[i].xx = centr_toch.xx + razmer_r * cos(ugol);
-            massiv_toch[i].yy = centr_toch.yy + razmer_r * sin(ugol);
+    void calculate_points() {
+        for (int i = 0; i < 8; i++) {
+            double angle = 2.0 * const_pi * i / 8.0;
+            points_array[i].a = center_point.a + radius_value * cos(angle);
+            points_array[i].b = center_point.b + radius_value * sin(angle);
         }
     }
     
-    void pokazat_tochki() {
-        cout << "8 ugol: ";
-        for(int i = 0; i < 8; i++) {
-            massiv_toch[i].pokazat();
-            cout << " ";
-        }
+    double get_area() {
+        return 2.0 * sqrt(2.0) * radius_value * radius_value;
     }
     
-    tochka_dvum centr_fig() {
-        return centr_toch;
-    }
-    
-    double ploshad_fig() {
-        return 2.0 * sqrt(2.0) * razmer_r * razmer_r;
-    }
-};
-
-// массив для хранения
-class hranilishche {
-public:
-    figura_5* massiv_5[100];
-    figura_6* massiv_6[100];
-    figura_8* massiv_8[100];
-    int kolvo_5;
-    int kolvo_6;
-    int kolvo_8;
-    
-    hranilishche() {
-        kolvo_5 = 0;
-        kolvo_6 = 0;
-        kolvo_8 = 0;
-    }
-    
-    void dobavit_5(figura_5* f) {
-        if(kolvo_5 < 100) {
-            massiv_5[kolvo_5] = f;
-            kolvo_5++;
+    void show() {
+        cout << "Eight shape points: ";
+        for (int i = 0; i < 8; i++) {
+            cout << "(" << points_array[i].a << "," << points_array[i].b << ") ";
         }
-    }
-    
-    void dobavit_6(figura_6* f) {
-        if(kolvo_6 < 100) {
-            massiv_6[kolvo_6] = f;
-            kolvo_6++;
-        }
-    }
-    
-    void dobavit_8(figura_8* f) {
-        if(kolvo_8 < 100) {
-            massiv_8[kolvo_8] = f;
-            kolvo_8++;
-        }
-    }
-    
-    void udalit_5(int nomer) {
-        if(nomer >= 0 && nomer < kolvo_5) {
-            delete massiv_5[nomer];
-            for(int i = nomer; i < kolvo_5 - 1; i++) {
-                massiv_5[i] = massiv_5[i + 1];
-            }
-            kolvo_5--;
-        }
-    }
-    
-    double vsego_ploshad() {
-        double summa = 0;
-        for(int i = 0; i < kolvo_5; i++) {
-            summa += massiv_5[i]->ploshad_fig();
-        }
-        for(int i = 0; i < kolvo_6; i++) {
-            summa += massiv_6[i]->ploshad_fig();
-        }
-        for(int i = 0; i < kolvo_8; i++) {
-            summa += massiv_8[i]->ploshad_fig();
-        }
-        return summa;
-    }
-    
-    void pokazat_vse() {
-        int nomer = 1;
-        
-        for(int i = 0; i < kolvo_5; i++) {
-            cout << "Figura " << nomer << ":\n";
-            massiv_5[i]->pokazat_tochki();
-            cout << "\nCentr: ";
-            massiv_5[i]->centr_fig().pokazat();
-            cout << "\nPloshad: " << massiv_5[i]->ploshad_fig() << "\n\n";
-            nomer++;
-        }
-        
-        for(int i = 0; i < kolvo_6; i++) {
-            cout << "Figura " << nomer << ":\n";
-            massiv_6[i]->pokazat_tochki();
-            cout << "\nCentr: ";
-            massiv_6[i]->centr_fig().pokazat();
-            cout << "\nPloshad: " << massiv_6[i]->ploshad_fig() << "\n\n";
-            nomer++;
-        }
-        
-        for(int i = 0; i < kolvo_8; i++) {
-            cout << "Figura " << nomer << ":\n";
-            massiv_8[i]->pokazat_tochki();
-            cout << "\nCentr: ";
-            massiv_8[i]->centr_fig().pokazat();
-            cout << "\nPloshad: " << massiv_8[i]->ploshad_fig() << "\n\n";
-            nomer++;
-        }
+        cout << endl;
     }
 };
 
 int main() {
-    cout << "=== PROGRAMMA DLYA FIGUR ===\n\n";
+    cout << "Program for shapes" << endl;
+    cout << "==================" << endl << endl;
     
-    hranilishche h;
+    // Create shapes
+    five_shape shape1(0, 0, 5.0);
+    six_shape shape2(2, 2, 3.0);
+    eight_shape shape3(-1, -1, 4.0);
     
-    // добавляем фигуры
-    h.dobavit_5(new figura_5(0, 0, 5));
-    h.dobavit_6(new figura_6(2, 2, 3));
-    h.dobavit_8(new figura_8(-1, -1, 4));
+    // Show shapes
+    cout << "Shape 1:" << endl;
+    shape1.show();
+    cout << "Area: " << shape1.get_area() << endl << endl;
     
-    cout << "VSE FIGURI:\n";
-    h.pokazat_vse();
+    cout << "Shape 2:" << endl;
+    shape2.show();
+    cout << "Area: " << shape2.get_area() << endl << endl;
     
-    cout << "Obshaya ploshad: " << h.vsego_ploshad() << "\n\n";
+    cout << "Shape 3:" << endl;
+    shape3.show();
+    cout << "Area: " << shape3.get_area() << endl << endl;
     
-    cout << "Udalim figuru nomer 2:\n";
-    h.udalit_5(0); // удаляем первую
+    // Total area
+    double total = shape1.get_area() + shape2.get_area() + shape3.get_area();
+    cout << "Total area: " << total << endl << endl;
     
-    cout << "Posle udaleniya:\n";
-    h.pokazat_vse();
+    // Test with different radius
+    cout << "Test with different radius:" << endl;
+    six_shape shape4(0, 0, 10);
+    cout << "Six shape with radius 10:" << endl;
+    shape4.show();
+    cout << "Area: " << shape4.get_area() << endl << endl;
     
-    // тест с вводом
-    cout << "\nTEST S VVODOM:\n";
-    figura_5 f5_new;
-    f5_new.prochitat_s_klav();
-    cout << "Ploshad: " << f5_new.ploshad_fig() << "\n";
-    cout << "Centr: ";
-    f5_new.centr_fig().pokazat();
-    cout << "\n";
+    // Manual input test
+    cout << "Enter parameters for five shape (x y radius): ";
+    double x, y, r;
+    cin >> x >> y >> r;
     
-    // тест с разными типами
-    cout << "\nTEST S RAZNYMI TIPAMI:\n";
-    figura_6 f6_int(0, 0, 10);
-    cout << "6 ugol s radiusom 10: " << f6_int.ploshad_fig() << "\n";
-    cout << "Tochki: ";
-    f6_int.pokazat_tochki();
-    cout << "\n";
+    five_shape shape5(x, y, r);
+    cout << "Created shape:" << endl;
+    shape5.show();
+    cout << "Area: " << shape5.get_area() << endl;
     
-    cout << "\nKONEC PROGRAMMY\n";
-    cout << "Najmite Enter...";
+    cout << endl << "Press Enter to exit...";
     cin.ignore();
     cin.get();
     
