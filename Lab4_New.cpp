@@ -1,189 +1,106 @@
 #include <iostream>
 #include <cmath>
 
-using namespace std;
-
-double const_pi = 3.14159265358979323846;
-
-class point {
-public:
-    double a;
-    double b;
-    
-    point() {
-        a = 0;
-        b = 0;
-    }
-    
-    point(double x, double y) {
-        a = x;
-        b = y;
-    }
-};
-
-class five_shape {
-public:
-    point center_point;
-    double radius_value;
-    point points_array[5];
-    
-    five_shape() {
-        center_point = point(0, 0);
-        radius_value = 0;
-        calculate_points();
-    }
-    
-    five_shape(double x, double y, double r) {
-        center_point = point(x, y);
-        radius_value = r;
-        calculate_points();
-    }
-    
-    void calculate_points() {
-        for (int i = 0; i < 5; i++) {
-            double angle = 2.0 * const_pi * i / 5.0;
-            points_array[i].a = center_point.a + radius_value * cos(angle);
-            points_array[i].b = center_point.b + radius_value * sin(angle);
-        }
-    }
-    
-    double get_area() {
-        return 0.25 * sqrt(5.0 * (5.0 + 2.0 * sqrt(5.0))) * radius_value * radius_value;
-    }
-    
-    void show() {
-        cout << "Five shape points: ";
-        for (int i = 0; i < 5; i++) {
-            cout << "(" << points_array[i].a << "," << points_array[i].b << ") ";
-        }
-        cout << endl;
-    }
-};
-
-class six_shape {
-public:
-    point center_point;
-    double radius_value;
-    point points_array[6];
-    
-    six_shape() {
-        center_point = point(0, 0);
-        radius_value = 0;
-        calculate_points();
-    }
-    
-    six_shape(double x, double y, double r) {
-        center_point = point(x, y);
-        radius_value = r;
-        calculate_points();
-    }
-    
-    void calculate_points() {
-        for (int i = 0; i < 6; i++) {
-            double angle = 2.0 * const_pi * i / 6.0;
-            points_array[i].a = center_point.a + radius_value * cos(angle);
-            points_array[i].b = center_point.b + radius_value * sin(angle);
-        }
-    }
-    
-    double get_area() {
-        return 1.5 * sqrt(3.0) * radius_value * radius_value;
-    }
-    
-    void show() {
-        cout << "Six shape points: ";
-        for (int i = 0; i < 6; i++) {
-            cout << "(" << points_array[i].a << "," << points_array[i].b << ") ";
-        }
-        cout << endl;
-    }
-};
-
-class eight_shape {
-public:
-    point center_point;
-    double radius_value;
-    point points_array[8];
-    
-    eight_shape() {
-        center_point = point(0, 0);
-        radius_value = 0;
-        calculate_points();
-    }
-    
-    eight_shape(double x, double y, double r) {
-        center_point = point(x, y);
-        radius_value = r;
-        calculate_points();
-    }
-    
-    void calculate_points() {
-        for (int i = 0; i < 8; i++) {
-            double angle = 2.0 * const_pi * i / 8.0;
-            points_array[i].a = center_point.a + radius_value * cos(angle);
-            points_array[i].b = center_point.b + radius_value * sin(angle);
-        }
-    }
-    
-    double get_area() {
-        return 2.0 * sqrt(2.0) * radius_value * radius_value;
-    }
-    
-    void show() {
-        cout << "Eight shape points: ";
-        for (int i = 0; i < 8; i++) {
-            cout << "(" << points_array[i].a << "," << points_array[i].b << ") ";
-        }
-        cout << endl;
-    }
-};
-
 int main() {
-    cout << "Program for shapes" << endl;
-    cout << "==================" << endl << endl;
+    std::cout << "Geometry shapes program\n\n";
     
-    // Create shapes
-    five_shape shape1(0, 0, 5.0);
-    six_shape shape2(2, 2, 3.0);
-    eight_shape shape3(-1, -1, 4.0);
+    // Five shape
+    double center_x1 = 0;
+    double center_y1 = 0;
+    double radius1 = 5.0;
     
-    // Show shapes
-    cout << "Shape 1:" << endl;
-    shape1.show();
-    cout << "Area: " << shape1.get_area() << endl << endl;
+    std::cout << "Five shape with center (" << center_x1 << "," << center_y1 
+              << ") radius " << radius1 << ":\n";
+    std::cout << "Points: ";
     
-    cout << "Shape 2:" << endl;
-    shape2.show();
-    cout << "Area: " << shape2.get_area() << endl << endl;
+    double points1_x[5];
+    double points1_y[5];
     
-    cout << "Shape 3:" << endl;
-    shape3.show();
-    cout << "Area: " << shape3.get_area() << endl << endl;
+    for (int i = 0; i < 5; i++) {
+        double angle = 2.0 * 3.141592653589793 * i / 5.0;
+        points1_x[i] = center_x1 + radius1 * cos(angle);
+        points1_y[i] = center_y1 + radius1 * sin(angle);
+        std::cout << "(" << points1_x[i] << "," << points1_y[i] << ") ";
+    }
+    
+    double area1 = 0.25 * sqrt(5.0 * (5.0 + 2.0 * sqrt(5.0))) * radius1 * radius1;
+    std::cout << "\nArea: " << area1 << "\n\n";
+    
+    // Six shape  
+    double center_x2 = 2;
+    double center_y2 = 2;
+    double radius2 = 3.0;
+    
+    std::cout << "Six shape with center (" << center_x2 << "," << center_y2 
+              << ") radius " << radius2 << ":\n";
+    std::cout << "Points: ";
+    
+    double points2_x[6];
+    double points2_y[6];
+    
+    for (int i = 0; i < 6; i++) {
+        double angle = 2.0 * 3.141592653589793 * i / 6.0;
+        points2_x[i] = center_x2 + radius2 * cos(angle);
+        points2_y[i] = center_y2 + radius2 * sin(angle);
+        std::cout << "(" << points2_x[i] << "," << points2_y[i] << ") ";
+    }
+    
+    double area2 = 1.5 * sqrt(3.0) * radius2 * radius2;
+    std::cout << "\nArea: " << area2 << "\n\n";
+    
+    // Eight shape
+    double center_x3 = -1;
+    double center_y3 = -1;
+    double radius3 = 4.0;
+    
+    std::cout << "Eight shape with center (" << center_x3 << "," << center_y3 
+              << ") radius " << radius3 << ":\n";
+    std::cout << "Points: ";
+    
+    double points3_x[8];
+    double points3_y[8];
+    
+    for (int i = 0; i < 8; i++) {
+        double angle = 2.0 * 3.141592653589793 * i / 8.0;
+        points3_x[i] = center_x3 + radius3 * cos(angle);
+        points3_y[i] = center_y3 + radius3 * sin(angle);
+        std::cout << "(" << points3_x[i] << "," << points3_y[i] << ") ";
+    }
+    
+    double area3 = 2.0 * sqrt(2.0) * radius3 * radius3;
+    std::cout << "\nArea: " << area3 << "\n\n";
     
     // Total area
-    double total = shape1.get_area() + shape2.get_area() + shape3.get_area();
-    cout << "Total area: " << total << endl << endl;
+    double total = area1 + area2 + area3;
+    std::cout << "Total area of all shapes: " << total << "\n\n";
     
-    // Test with different radius
-    cout << "Test with different radius:" << endl;
-    six_shape shape4(0, 0, 10);
-    cout << "Six shape with radius 10:" << endl;
-    shape4.show();
-    cout << "Area: " << shape4.get_area() << endl << endl;
+    // Another six shape
+    std::cout << "Another six shape with radius 10:\n";
+    double radius4 = 10;
+    double area4 = 1.5 * sqrt(3.0) * radius4 * radius4;
+    std::cout << "Area: " << area4 << "\n\n";
     
-    // Manual input test
-    cout << "Enter parameters for five shape (x y radius): ";
-    double x, y, r;
-    cin >> x >> y >> r;
+    // User input
+    std::cout << "Enter parameters for five shape (center_x center_y radius): ";
+    double user_x, user_y, user_r;
+    std::cin >> user_x >> user_y >> user_r;
     
-    five_shape shape5(x, y, r);
-    cout << "Created shape:" << endl;
-    shape5.show();
-    cout << "Area: " << shape5.get_area() << endl;
+    std::cout << "\nUser five shape:\n";
+    std::cout << "Points: ";
+    for (int i = 0; i < 5; i++) {
+        double angle = 2.0 * 3.141592653589793 * i / 5.0;
+        double x = user_x + user_r * cos(angle);
+        double y = user_y + user_r * sin(angle);
+        std::cout << "(" << x << "," << y << ") ";
+    }
     
-    cout << endl << "Press Enter to exit...";
-    cin.ignore();
-    cin.get();
+    double user_area = 0.25 * sqrt(5.0 * (5.0 + 2.0 * sqrt(5.0))) * user_r * user_r;
+    std::cout << "\nArea: " << user_area << "\n\n";
+    
+    std::cout << "Program finished\n";
+    std::cout << "Press Enter to exit...";
+    std::cin.ignore();
+    std::cin.get();
     
     return 0;
 }
