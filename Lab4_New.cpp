@@ -1,391 +1,302 @@
 #include <iostream>
-#include <vector>
 #include <cmath>
-#include <memory>
 
 using namespace std;
 
-#define PI_CHISLO 3.14159265358979323846
-
-// шаблон для чисел
-template<typename T>
-class chislo_type {
-public:
-    static bool proverka() {
-        return is_scalar_v<T>;
-    }
-};
+#define PI_CHISLO 3.141592653589793
 
 // точка
-template<typename T>
-class tochka {
+class tochka_dvum {
 public:
-    T x;
-    T y;
+    double xx;
+    double yy;
     
-    tochka(T xx = 0, T yy = 0) {
-        x = xx;
-        y = yy;
+    tochka_dvum() {
+        xx = 0;
+        yy = 0;
     }
     
-    T get_x() { return x; }
-    T get_y() { return y; }
-    
-    void vivod() {
-        cout << "(" << x << " " << y << ")";
+    tochka_dvum(double x1, double y1) {
+        xx = x1;
+        yy = y1;
     }
     
-    bool ravna(tochka t) {
-        return x == t.x && y == t.y;
+    void pokazat() {
+        cout << "(" << xx << "," << yy << ")";
     }
-};
-
-// база для фигур
-template<typename T>
-class figura_baza {
-public:
-    vector<tochka<T>*> tochki;
-    
-    virtual ~figura_baza() {
-        for(auto t : tochki) delete t;
-    }
-    
-    virtual tochka<T> centr() = 0;
-    virtual void pokazat_tochki() = 0;
-    virtual void prochitat() = 0;
-    virtual double plosh() = 0;
-    
-    virtual bool sravn(figura_baza* drugoi) = 0;
 };
 
 // 5 угольник
-template<typename T>
-class pyatugol : public figura_baza<T> {
+class figura_5 {
 public:
-    tochka<T> centr_tochka;
-    T radius;
+    tochka_dvum centr_toch;
+    double razmer_r;
+    tochka_dvum massiv_toch[5];
     
-    pyatugol() {
-        centr_tochka = tochka<T>(0, 0);
-        radius = 0;
-        pereschitat();
+    figura_5() {
+        centr_toch = tochka_dvum(0, 0);
+        razmer_r = 0;
+        raschet_toch();
     }
     
-    pyatugol(T cx, T cy, T r) {
-        centr_tochka = tochka<T>(cx, cy);
-        radius = r;
-        pereschitat();
+    figura_5(double cx, double cy, double r) {
+        centr_toch = tochka_dvum(cx, cy);
+        razmer_r = r;
+        raschet_toch();
     }
     
-    void pereschitat() {
-        for(auto t : this->tochki) delete t;
-        this->tochki.clear();
-        
+    void raschet_toch() {
         for(int i = 0; i < 5; i++) {
             double ugol = 2.0 * PI_CHISLO * i / 5.0;
-            T x = centr_tochka.x + radius * cos(ugol);
-            T y = centr_tochka.y + radius * sin(ugol);
-            this->tochki.push_back(new tochka<T>(x, y));
+            massiv_toch[i].xx = centr_toch.xx + razmer_r * cos(ugol);
+            massiv_toch[i].yy = centr_toch.yy + razmer_r * sin(ugol);
         }
     }
     
-    tochka<T> centr() override {
-        return centr_tochka;
-    }
-    
-    void pokazat_tochki() override {
-        cout << "pyatugol: ";
-        for(auto t : this->tochki) {
-            t->vivod();
+    void pokazat_tochki() {
+        cout << "5 ugol: ";
+        for(int i = 0; i < 5; i++) {
+            massiv_toch[i].pokazat();
             cout << " ";
         }
     }
     
-    void prochitat() override {
-        T a, b, c;
-        cin >> a >> b >> c;
-        centr_tochka = tochka<T>(a, b);
-        radius = c;
-        pereschitat();
+    tochka_dvum centr_fig() {
+        return centr_toch;
     }
     
-    double plosh() override {
-        return 0.25 * sqrt(5.0 * (5.0 + 2.0 * sqrt(5.0))) * radius * radius;
+    double ploshad_fig() {
+        return 0.25 * sqrt(5.0 * (5.0 + 2.0 * sqrt(5.0))) * razmer_r * razmer_r;
     }
     
-    bool sravn(figura_baza<T>* drugoi) override {
-        auto p = dynamic_cast<pyatugol<T>*>(drugoi);
-        if(!p) return false;
-        return centr_tochka.ravna(p->centr_tochka) && radius == p->radius;
-    }
-    
-    operator double() {
-        return plosh();
+    void prochitat_s_klav() {
+        cout << "Vvedite 3 chisla: ";
+        cin >> centr_toch.xx >> centr_toch.yy >> razmer_r;
+        raschet_toch();
     }
 };
 
-// 6 угольник
-template<typename T>
-class shestiugol : public figura_baza<T> {
+// 6 угольник  
+class figura_6 {
 public:
-    tochka<T> centr_tochka;
-    T radius;
+    tochka_dvum centr_toch;
+    double razmer_r;
+    tochka_dvum massiv_toch[6];
     
-    shestiugol() {
-        centr_tochka = tochka<T>(0, 0);
-        radius = 0;
-        pereschitat();
+    figura_6() {
+        centr_toch = tochka_dvum(0, 0);
+        razmer_r = 0;
+        raschet_toch();
     }
     
-    shestiugol(T cx, T cy, T r) {
-        centr_tochka = tochka<T>(cx, cy);
-        radius = r;
-        pereschitat();
+    figura_6(double cx, double cy, double r) {
+        centr_toch = tochka_dvum(cx, cy);
+        razmer_r = r;
+        raschet_toch();
     }
     
-    void pereschitat() {
-        for(auto t : this->tochki) delete t;
-        this->tochki.clear();
-        
+    void raschet_toch() {
         for(int i = 0; i < 6; i++) {
             double ugol = 2.0 * PI_CHISLO * i / 6.0;
-            T x = centr_tochka.x + radius * cos(ugol);
-            T y = centr_tochka.y + radius * sin(ugol);
-            this->tochki.push_back(new tochka<T>(x, y));
+            massiv_toch[i].xx = centr_toch.xx + razmer_r * cos(ugol);
+            massiv_toch[i].yy = centr_toch.yy + razmer_r * sin(ugol);
         }
     }
     
-    tochka<T> centr() override {
-        return centr_tochka;
-    }
-    
-    void pokazat_tochki() override {
-        cout << "shestiugol: ";
-        for(auto t : this->tochki) {
-            t->vivod();
+    void pokazat_tochki() {
+        cout << "6 ugol: ";
+        for(int i = 0; i < 6; i++) {
+            massiv_toch[i].pokazat();
             cout << " ";
         }
     }
     
-    void prochitat() override {
-        T a, b, c;
-        cin >> a >> b >> c;
-        centr_tochka = tochka<T>(a, b);
-        radius = c;
-        pereschitat();
+    tochka_dvum centr_fig() {
+        return centr_toch;
     }
     
-    double plosh() override {
-        return 1.5 * sqrt(3.0) * radius * radius;
-    }
-    
-    bool sravn(figura_baza<T>* drugoi) override {
-        auto s = dynamic_cast<shestiugol<T>*>(drugoi);
-        if(!s) return false;
-        return centr_tochka.ravna(s->centr_tochka) && radius == s->radius;
-    }
-    
-    operator double() {
-        return plosh();
+    double ploshad_fig() {
+        return 1.5 * sqrt(3.0) * razmer_r * razmer_r;
     }
 };
 
 // 8 угольник
-template<typename T>
-class vosmiugol : public figura_baza<T> {
+class figura_8 {
 public:
-    tochka<T> centr_tochka;
-    T radius;
+    tochka_dvum centr_toch;
+    double razmer_r;
+    tochka_dvum massiv_toch[8];
     
-    vosmiugol() {
-        centr_tochka = tochka<T>(0, 0);
-        radius = 0;
-        pereschitat();
+    figura_8() {
+        centr_toch = tochka_dvum(0, 0);
+        razmer_r = 0;
+        raschet_toch();
     }
     
-    vosmiugol(T cx, T cy, T r) {
-        centr_tochka = tochka<T>(cx, cy);
-        radius = r;
-        pereschitat();
+    figura_8(double cx, double cy, double r) {
+        centr_toch = tochka_dvum(cx, cy);
+        razmer_r = r;
+        raschet_toch();
     }
     
-    void pereschitat() {
-        for(auto t : this->tochki) delete t;
-        this->tochki.clear();
-        
+    void raschet_toch() {
         for(int i = 0; i < 8; i++) {
             double ugol = 2.0 * PI_CHISLO * i / 8.0;
-            T x = centr_tochka.x + radius * cos(ugol);
-            T y = centr_tochka.y + radius * sin(ugol);
-            this->tochki.push_back(new tochka<T>(x, y));
+            massiv_toch[i].xx = centr_toch.xx + razmer_r * cos(ugol);
+            massiv_toch[i].yy = centr_toch.yy + razmer_r * sin(ugol);
         }
     }
     
-    tochka<T> centr() override {
-        return centr_tochka;
-    }
-    
-    void pokazat_tochki() override {
-        cout << "vosmiugol: ";
-        for(auto t : this->tochki) {
-            t->vivod();
+    void pokazat_tochki() {
+        cout << "8 ugol: ";
+        for(int i = 0; i < 8; i++) {
+            massiv_toch[i].pokazat();
             cout << " ";
         }
     }
     
-    void prochitat() override {
-        T a, b, c;
-        cin >> a >> b >> c;
-        centr_tochka = tochka<T>(a, b);
-        radius = c;
-        pereschitat();
+    tochka_dvum centr_fig() {
+        return centr_toch;
     }
     
-    double plosh() override {
-        return 2.0 * sqrt(2.0) * radius * radius;
-    }
-    
-    bool sravn(figura_baza<T>* drugoi) override {
-        auto v = dynamic_cast<vosmiugol<T>*>(drugoi);
-        if(!v) return false;
-        return centr_tochka.ravna(v->centr_tochka) && radius == v->radius;
-    }
-    
-    operator double() {
-        return plosh();
+    double ploshad_fig() {
+        return 2.0 * sqrt(2.0) * razmer_r * razmer_r;
     }
 };
 
-// массив
-template<typename T>
-class massiv_figur {
-    T** data;
-    int capacity;
-    int size;
-    
-    void uvelichit() {
-        int noviy = capacity == 0 ? 1 : capacity * 2;
-        T** noviy_massiv = new T*[noviy];
-        
-        for(int i = 0; i < size; i++) {
-            noviy_massiv[i] = data[i];
-        }
-        
-        delete[] data;
-        data = noviy_massiv;
-        capacity = noviy;
-    }
-    
+// массив для хранения
+class hranilishche {
 public:
-    massiv_figur() {
-        data = nullptr;
-        capacity = 0;
-        size = 0;
+    figura_5* massiv_5[100];
+    figura_6* massiv_6[100];
+    figura_8* massiv_8[100];
+    int kolvo_5;
+    int kolvo_6;
+    int kolvo_8;
+    
+    hranilishche() {
+        kolvo_5 = 0;
+        kolvo_6 = 0;
+        kolvo_8 = 0;
     }
     
-    ~massiv_figur() {
-        for(int i = 0; i < size; i++) {
-            delete data[i];
+    void dobavit_5(figura_5* f) {
+        if(kolvo_5 < 100) {
+            massiv_5[kolvo_5] = f;
+            kolvo_5++;
         }
-        delete[] data;
     }
     
-    void dobavit(T* figura) {
-        if(size >= capacity) {
-            uvelichit();
+    void dobavit_6(figura_6* f) {
+        if(kolvo_6 < 100) {
+            massiv_6[kolvo_6] = f;
+            kolvo_6++;
         }
-        data[size] = figura;
-        size++;
     }
     
-    void udalit(int index) {
-        if(index < 0 || index >= size) return;
-        
-        delete data[index];
-        
-        for(int i = index; i < size - 1; i++) {
-            data[i] = data[i + 1];
+    void dobavit_8(figura_8* f) {
+        if(kolvo_8 < 100) {
+            massiv_8[kolvo_8] = f;
+            kolvo_8++;
         }
-        size--;
     }
     
-    T* get(int index) {
-        if(index < 0 || index >= size) return nullptr;
-        return data[index];
-    }
-    
-    int kolvo() {
-        return size;
+    void udalit_5(int nomer) {
+        if(nomer >= 0 && nomer < kolvo_5) {
+            delete massiv_5[nomer];
+            for(int i = nomer; i < kolvo_5 - 1; i++) {
+                massiv_5[i] = massiv_5[i + 1];
+            }
+            kolvo_5--;
+        }
     }
     
     double vsego_ploshad() {
-        double sum = 0;
-        for(int i = 0; i < size; i++) {
-            sum += (double)(*data[i]);
+        double summa = 0;
+        for(int i = 0; i < kolvo_5; i++) {
+            summa += massiv_5[i]->ploshad_fig();
         }
-        return sum;
+        for(int i = 0; i < kolvo_6; i++) {
+            summa += massiv_6[i]->ploshad_fig();
+        }
+        for(int i = 0; i < kolvo_8; i++) {
+            summa += massiv_8[i]->ploshad_fig();
+        }
+        return summa;
     }
     
     void pokazat_vse() {
-        for(int i = 0; i < size; i++) {
-            cout << "Figura " << i+1 << ":\n";
-            data[i]->pokazat_tochki();
+        int nomer = 1;
+        
+        for(int i = 0; i < kolvo_5; i++) {
+            cout << "Figura " << nomer << ":\n";
+            massiv_5[i]->pokazat_tochki();
             cout << "\nCentr: ";
-            data[i]->centr().vivod();
-            cout << "\nPloshad: " << (double)(*data[i]) << "\n\n";
+            massiv_5[i]->centr_fig().pokazat();
+            cout << "\nPloshad: " << massiv_5[i]->ploshad_fig() << "\n\n";
+            nomer++;
+        }
+        
+        for(int i = 0; i < kolvo_6; i++) {
+            cout << "Figura " << nomer << ":\n";
+            massiv_6[i]->pokazat_tochki();
+            cout << "\nCentr: ";
+            massiv_6[i]->centr_fig().pokazat();
+            cout << "\nPloshad: " << massiv_6[i]->ploshad_fig() << "\n\n";
+            nomer++;
+        }
+        
+        for(int i = 0; i < kolvo_8; i++) {
+            cout << "Figura " << nomer << ":\n";
+            massiv_8[i]->pokazat_tochki();
+            cout << "\nCentr: ";
+            massiv_8[i]->centr_fig().pokazat();
+            cout << "\nPloshad: " << massiv_8[i]->ploshad_fig() << "\n\n";
+            nomer++;
         }
     }
 };
 
 int main() {
-    cout << "START\n\n";
+    cout << "=== PROGRAMMA DLYA FIGUR ===\n\n";
     
-    // тест 1
-    cout << "TEST 1:\n";
-    massiv_figur<figura_baza<double>> m;
+    hranilishche h;
     
-    m.dobavit(new pyatugol<double>(0, 0, 5));
-    m.dobavit(new shestiugol<double>(2, 2, 3));
-    m.dobavit(new vosmiugol<double>(-1, -1, 4));
+    // добавляем фигуры
+    h.dobavit_5(new figura_5(0, 0, 5));
+    h.dobavit_6(new figura_6(2, 2, 3));
+    h.dobavit_8(new figura_8(-1, -1, 4));
     
-    m.pokazat_vse();
-    cout << "Vsego ploshad: " << m.vsego_ploshad() << "\n\n";
+    cout << "VSE FIGURI:\n";
+    h.pokazat_vse();
     
-    m.udalit(1);
+    cout << "Obshaya ploshad: " << h.vsego_ploshad() << "\n\n";
+    
+    cout << "Udalim figuru nomer 2:\n";
+    h.udalit_5(0); // удаляем первую
+    
     cout << "Posle udaleniya:\n";
-    m.pokazat_vse();
+    h.pokazat_vse();
     
-    // тест 2
-    cout << "\nTEST 2:\n";
-    shestiugol<int> s(0, 0, 10);
-    cout << "Ploshad: " << (double)s << "\n";
+    // тест с вводом
+    cout << "\nTEST S VVODOM:\n";
+    figura_5 f5_new;
+    f5_new.prochitat_s_klav();
+    cout << "Ploshad: " << f5_new.ploshad_fig() << "\n";
     cout << "Centr: ";
-    s.centr().vivod();
-    cout << "\nTochki: ";
-    s.pokazat_tochki();
+    f5_new.centr_fig().pokazat();
     cout << "\n";
     
-    // тест 3
-    cout << "\nTEST 3:\n";
-    cout << "Vvedite 3 chisla: ";
-    pyatugol<double> p;
-    p.prochitat();
-    cout << "Ploshad: " << (double)p << "\n";
-    cout << "Centr: ";
-    p.centr().vivod();
+    // тест с разными типами
+    cout << "\nTEST S RAZNYMI TIPAMI:\n";
+    figura_6 f6_int(0, 0, 10);
+    cout << "6 ugol s radiusom 10: " << f6_int.ploshad_fig() << "\n";
+    cout << "Tochki: ";
+    f6_int.pokazat_tochki();
     cout << "\n";
     
-    // тест 4
-    cout << "\nTEST 4:\n";
-    massiv_figur<shestiugol<float>> m2;
-    m2.dobavit(new shestiugol<float>(0, 0, 2));
-    m2.dobavit(new shestiugol<float>(1, 1, 1.5));
-    
-    for(int i = 0; i < m2.kolvo(); i++) {
-        cout << "Figura " << i+1 << " ploshad: " << (double)(*m2.get(i)) << "\n";
-    }
-    
-    cout << "\nEND\nPress Enter...";
+    cout << "\nKONEC PROGRAMMY\n";
+    cout << "Najmite Enter...";
     cin.ignore();
     cin.get();
     
