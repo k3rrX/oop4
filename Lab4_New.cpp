@@ -3,386 +3,323 @@
 #include <vector>
 #include <cmath>
 #include <concepts>
-#include <stdexcept>
 
-// Проверка типа (число или не число)
-template<typename T>
-concept NumberType = std::is_scalar_v<T>;
+// Проверка чтоб тип был числовой
+template<typename TT>
+concept NumLike = std::is_scalar_v<TT>;
 
-#ifndef M_PI
-#define M_PI 3.14159265358979323846
+#ifndef MY_PI
+#define MY_PI 3.14159265358979323846
 #endif
 
-// Точка на плоскости
-template<NumberType T>
-class Dot {
-private:
-    T xx, yy;
+// Точка с двумя координатами
+template<NumLike TT>
+class Spot {
+    TT x_val, y_val;
 public:
-    Dot(T a = 0, T b = 0) : xx(a), yy(b) {}
+    Spot(TT x = 0, TT y = 0) : x_val(x), y_val(y) {}
     
-    T X() const { return xx; }
-    T Y() const { return yy; }
+    TT x() const { return x_val; }
+    TT y() const { return y_val; }
     
-    friend std::ostream& operator<<(std::ostream& out, const Dot& d) {
-        out << "(" << d.xx << ", " << d.yy << ")";
-        return out;
+    friend std::ostream& operator<<(std::ostream& os, const Spot& s) {
+        os << "[" << s.x_val << "," << s.y_val << "]";
+        return os;
     }
     
-    bool same(const Dot& other) const {
-        return xx == other.xx && yy == other.yy;
+    bool check(const Spot& s2) const {
+        return x_val == s2.x_val && y_val == s2.y_val;
     }
 };
 
-// Базовая штука (фигура)
-template<NumberType T>
-class BaseShape {
+// Базовая фигура
+template<NumLike TT>
+class BaseFigura {
 protected:
-    std::vector<std::unique_ptr<Dot<T>>> corners;
+    std::vector<std::unique_ptr<Spot<TT>>> dots;
     
 public:
-    virtual ~BaseShape() = default;
+    virtual ~BaseFigura() {}
     
-    virtual Dot<T> middle() const = 0;
-    virtual void showCorners(std::ostream& out) const = 0;
-    virtual void getFromInput(std::istream& in) = 0;
-    virtual operator double() const = 0;
+    virtual Spot<TT> center_point() const = 0;
+    virtual void show_dots(std::ostream& os) const = 0;
+    virtual void read_data(std::istream& is) = 0;
+    virtual double area_value() const = 0;
     
-    friend std::ostream& operator<<(std::ostream& out, const BaseShape& s) {
-        s.showCorners(out);
-        return out;
+    friend std::ostream& operator<<(std::ostream& os, const BaseFigura& bf) {
+        bf.show_dots(os);
+        return os;
     }
     
-    friend std::istream& operator>>(std::istream& in, BaseShape& s) {
-        s.getFromInput(in);
-        return in;
+    friend std::istream& operator>>(std::istream& is, BaseFigura& bf) {
+        bf.read_data(is);
+        return is;
     }
     
-    virtual bool sameShape(const BaseShape& other) const = 0;
+    virtual bool compare(const BaseFigura& bf2) const = 0;
+    
+    operator double() const { return area_value(); }
 };
 
-// Пять углов
-template<NumberType T>
-class FiveCorner : public BaseShape<T> {
-private:
-    Dot<T> middlePoint;
-    T sizeR;
+// Фигура с 5 углами
+template<NumLike TT>
+class Figura5 : public BaseFigura<TT> {
+    Spot<TT> cntr;
+    TT rad_val;
     
-    void makeCorners() {
-        this->corners.clear();
-        for (int j = 0; j < 5; j++) {
-            double angleVal = 2.0 * M_PI * j / 5.0;
-            T xVal = middlePoint.X() + sizeR * std::cos(angleVal);
-            T yVal = middlePoint.Y() + sizeR * std::sin(angleVal);
-            this->corners.push_back(std::make_unique<Dot<T>>(xVal, yVal));
+    void calc_dots() {
+        this->dots.clear();
+        for (int cnt = 0; cnt < 5; cnt++) {
+            double ang = 2.0 * MY_PI * cnt / 5.0;
+            TT x = cntr.x() + rad_val * std::cos(ang);
+            TT y = cntr.y() + rad_val * std::sin(ang);
+            this->dots.push_back(std::make_unique<Spot<TT>>(x, y));
         }
     }
     
 public:
-    FiveCorner() : middlePoint(0, 0), sizeR(0) {
-        makeCorners();
+    Figura5() : cntr(0, 0), rad_val(0) { calc_dots(); }
+    Figura5(TT cx, TT cy, TT r) : cntr(cx, cy), rad_val(r) { calc_dots(); }
+    
+    Spot<TT> center_point() const override { return cntr; }
+    
+    void show_dots(std::ostream& os) const override {
+        os << "Figura5 dots: ";
+        for (const auto& d : this->dots) os << *d << " ";
     }
     
-    FiveCorner(T mx, T my, T r) : middlePoint(mx, my), sizeR(r) {
-        makeCorners();
-    }
-    
-    Dot<T> middle() const override {
-        return middlePoint;
-    }
-    
-    void showCorners(std::ostream& out) const override {
-        out << "FiveCorner points: ";
-        for (const auto& c : this->corners) {
-            out << *c << " ";
+    void read_data(std::istream& is) override {
+        TT a, b, c;
+        if (is >> a >> b >> c) {
+            cntr = Spot<TT>(a, b);
+            rad_val = c;
+            calc_dots();
         }
     }
     
-    void getFromInput(std::istream& in) override {
-        T mx, my, r;
-        if (in >> mx >> my >> r) {
-            middlePoint = Dot<T>(mx, my);
-            sizeR = r;
-            makeCorners();
-        }
+    double area_value() const override {
+        return 0.25 * std::sqrt(5.0 * (5.0 + 2.0 * std::sqrt(5.0))) * rad_val * rad_val;
     }
     
-    operator double() const override {
-        return 0.25 * std::sqrt(5.0 * (5.0 + 2.0 * std::sqrt(5.0))) * sizeR * sizeR;
-    }
-    
-    bool sameShape(const BaseShape<T>& other) const override {
-        const FiveCorner* fc = dynamic_cast<const FiveCorner*>(&other);
-        if (!fc) return false;
-        return middlePoint.same(fc->middlePoint) && sizeR == fc->sizeR;
+    bool compare(const BaseFigura<TT>& bf2) const override {
+        const Figura5* f = dynamic_cast<const Figura5*>(&bf2);
+        if (!f) return false;
+        return cntr.check(f->cntr) && rad_val == f->rad_val;
     }
 };
 
-// Шесть углов
-template<NumberType T>
-class SixCorner : public BaseShape<T> {
-private:
-    Dot<T> middlePoint;
-    T sizeR;
+// Фигура с 6 углами
+template<NumLike TT>
+class Figura6 : public BaseFigura<TT> {
+    Spot<TT> cntr;
+    TT rad_val;
     
-    void makeCorners() {
-        this->corners.clear();
-        for (int j = 0; j < 6; j++) {
-            double angleVal = 2.0 * M_PI * j / 6.0;
-            T xVal = middlePoint.X() + sizeR * std::cos(angleVal);
-            T yVal = middlePoint.Y() + sizeR * std::sin(angleVal);
-            this->corners.push_back(std::make_unique<Dot<T>>(xVal, yVal));
+    void calc_dots() {
+        this->dots.clear();
+        for (int cnt = 0; cnt < 6; cnt++) {
+            double ang = 2.0 * MY_PI * cnt / 6.0;
+            TT x = cntr.x() + rad_val * std::cos(ang);
+            TT y = cntr.y() + rad_val * std::sin(ang);
+            this->dots.push_back(std::make_unique<Spot<TT>>(x, y));
         }
     }
     
 public:
-    SixCorner() : middlePoint(0, 0), sizeR(0) {
-        makeCorners();
+    Figura6() : cntr(0, 0), rad_val(0) { calc_dots(); }
+    Figura6(TT cx, TT cy, TT r) : cntr(cx, cy), rad_val(r) { calc_dots(); }
+    
+    Spot<TT> center_point() const override { return cntr; }
+    
+    void show_dots(std::ostream& os) const override {
+        os << "Figura6 dots: ";
+        for (const auto& d : this->dots) os << *d << " ";
     }
     
-    SixCorner(T mx, T my, T r) : middlePoint(mx, my), sizeR(r) {
-        makeCorners();
-    }
-    
-    Dot<T> middle() const override {
-        return middlePoint;
-    }
-    
-    void showCorners(std::ostream& out) const override {
-        out << "SixCorner points: ";
-        for (const auto& c : this->corners) {
-            out << *c << " ";
+    void read_data(std::istream& is) override {
+        TT a, b, c;
+        if (is >> a >> b >> c) {
+            cntr = Spot<TT>(a, b);
+            rad_val = c;
+            calc_dots();
         }
     }
     
-    void getFromInput(std::istream& in) override {
-        T mx, my, r;
-        if (in >> mx >> my >> r) {
-            middlePoint = Dot<T>(mx, my);
-            sizeR = r;
-            makeCorners();
-        }
+    double area_value() const override {
+        return 1.5 * std::sqrt(3.0) * rad_val * rad_val;
     }
     
-    operator double() const override {
-        return 1.5 * std::sqrt(3.0) * sizeR * sizeR;
-    }
-    
-    bool sameShape(const BaseShape<T>& other) const override {
-        const SixCorner* sc = dynamic_cast<const SixCorner*>(&other);
-        if (!sc) return false;
-        return middlePoint.same(sc->middlePoint) && sizeR == sc->sizeR;
+    bool compare(const BaseFigura<TT>& bf2) const override {
+        const Figura6* f = dynamic_cast<const Figura6*>(&bf2);
+        if (!f) return false;
+        return cntr.check(f->cntr) && rad_val == f->rad_val;
     }
 };
 
-// Восемь углов
-template<NumberType T>
-class EightCorner : public BaseShape<T> {
-private:
-    Dot<T> middlePoint;
-    T sizeR;
+// Фигура с 8 углами
+template<NumLike TT>
+class Figura8 : public BaseFigura<TT> {
+    Spot<TT> cntr;
+    TT rad_val;
     
-    void makeCorners() {
-        this->corners.clear();
-        for (int j = 0; j < 8; j++) {
-            double angleVal = 2.0 * M_PI * j / 8.0;
-            T xVal = middlePoint.X() + sizeR * std::cos(angleVal);
-            T yVal = middlePoint.Y() + sizeR * std::sin(angleVal);
-            this->corners.push_back(std::make_unique<Dot<T>>(xVal, yVal));
+    void calc_dots() {
+        this->dots.clear();
+        for (int cnt = 0; cnt < 8; cnt++) {
+            double ang = 2.0 * MY_PI * cnt / 8.0;
+            TT x = cntr.x() + rad_val * std::cos(ang);
+            TT y = cntr.y() + rad_val * std::sin(ang);
+            this->dots.push_back(std::make_unique<Spot<TT>>(x, y));
         }
     }
     
 public:
-    EightCorner() : middlePoint(0, 0), sizeR(0) {
-        makeCorners();
+    Figura8() : cntr(0, 0), rad_val(0) { calc_dots(); }
+    Figura8(TT cx, TT cy, TT r) : cntr(cx, cy), rad_val(r) { calc_dots(); }
+    
+    Spot<TT> center_point() const override { return cntr; }
+    
+    void show_dots(std::ostream& os) const override {
+        os << "Figura8 dots: ";
+        for (const auto& d : this->dots) os << *d << " ";
     }
     
-    EightCorner(T mx, T my, T r) : middlePoint(mx, my), sizeR(r) {
-        makeCorners();
-    }
-    
-    Dot<T> middle() const override {
-        return middlePoint;
-    }
-    
-    void showCorners(std::ostream& out) const override {
-        out << "EightCorner points: ";
-        for (const auto& c : this->corners) {
-            out << *c << " ";
+    void read_data(std::istream& is) override {
+        TT a, b, c;
+        if (is >> a >> b >> c) {
+            cntr = Spot<TT>(a, b);
+            rad_val = c;
+            calc_dots();
         }
     }
     
-    void getFromInput(std::istream& in) override {
-        T mx, my, r;
-        if (in >> mx >> my >> r) {
-            middlePoint = Dot<T>(mx, my);
-            sizeR = r;
-            makeCorners();
-        }
+    double area_value() const override {
+        return 2.0 * std::sqrt(2.0) * rad_val * rad_val;
     }
     
-    operator double() const override {
-        return 2.0 * std::sqrt(2.0) * sizeR * sizeR;
-    }
-    
-    bool sameShape(const BaseShape<T>& other) const override {
-        const EightCorner* ec = dynamic_cast<const EightCorner*>(&other);
-        if (!ec) return false;
-        return middlePoint.same(ec->middlePoint) && sizeR == ec->sizeR;
+    bool compare(const BaseFigura<TT>& bf2) const override {
+        const Figura8* f = dynamic_cast<const Figura8*>(&bf2);
+        if (!f) return false;
+        return cntr.check(f->cntr) && rad_val == f->rad_val;
     }
 };
 
-// Шаблонная коробка для хранения
-template<class Stuff>
-class Box {
-private:
-    std::shared_ptr<Stuff[]> stuffArray;
-    size_t maxSize;
-    size_t currentSize;
+// Контейнер для хранения
+template<class ItemType>
+class Storage {
+    std::shared_ptr<ItemType[]> items;
+    size_t max_items;
+    size_t item_count;
     
-    void makeBigger(size_t newMax) {
-        std::shared_ptr<Stuff[]> newArray(new Stuff[newMax]);
-        
-        for (size_t k = 0; k < currentSize; k++) {
-            newArray[k] = std::move(stuffArray[k]);
+    void resize_storage(size_t new_max) {
+        std::shared_ptr<ItemType[]> new_items(new ItemType[new_max]);
+        for (size_t i = 0; i < item_count; i++) {
+            new_items[i] = std::move(items[i]);
         }
-        
-        stuffArray = std::move(newArray);
-        maxSize = newMax;
+        items = std::move(new_items);
+        max_items = new_max;
     }
     
 public:
-    Box() : stuffArray(nullptr), maxSize(0), currentSize(0) {}
+    Storage() : items(nullptr), max_items(0), item_count(0) {}
     
-    Box(size_t startSize) : maxSize(startSize), currentSize(0) {
-        stuffArray = std::shared_ptr<Stuff[]>(new Stuff[maxSize]);
-    }
-    
-    ~Box() = default;
-    
-    void putIn(const Stuff& thing) {
-        if (currentSize >= maxSize) {
-            makeBigger(maxSize == 0 ? 1 : maxSize * 2);
+    void add_item(const ItemType& item) {
+        if (item_count >= max_items) {
+            resize_storage(max_items == 0 ? 1 : max_items * 2);
         }
-        stuffArray[currentSize++] = thing;
+        items[item_count++] = item;
     }
     
-    void putIn(Stuff&& thing) {
-        if (currentSize >= maxSize) {
-            makeBigger(maxSize == 0 ? 1 : maxSize * 2);
+    void add_item(ItemType&& item) {
+        if (item_count >= max_items) {
+            resize_storage(max_items == 0 ? 1 : max_items * 2);
         }
-        stuffArray[currentSize] = std::move(thing);
-        currentSize++;
+        items[item_count] = std::move(item);
+        item_count++;
     }
     
-    void takeOut(size_t idx) {
-        if (idx >= currentSize) {
-            throw std::out_of_range("No such index");
+    void remove_item(size_t pos) {
+        if (pos >= item_count) return;
+        for (size_t i = pos; i < item_count - 1; i++) {
+            items[i] = std::move(items[i + 1]);
         }
-        
-        for (size_t k = idx; k < currentSize - 1; k++) {
-            stuffArray[k] = std::move(stuffArray[k + 1]);
+        item_count--;
+    }
+    
+    ItemType& get_item(size_t pos) {
+        return items[pos];
+    }
+    
+    const ItemType& get_item(size_t pos) const {
+        return items[pos];
+    }
+    
+    size_t size() const { return item_count; }
+    
+    double total_area() const {
+        double sum = 0;
+        for (size_t i = 0; i < item_count; i++) {
+            sum += static_cast<double>(*items[i]);
         }
-        currentSize--;
+        return sum;
     }
     
-    Stuff& getThing(size_t idx) {
-        if (idx >= currentSize) {
-            throw std::out_of_range("No such index");
-        }
-        return stuffArray[idx];
-    }
-    
-    const Stuff& getThing(size_t idx) const {
-        if (idx >= currentSize) {
-            throw std::out_of_range("No such index");
-        }
-        return stuffArray[idx];
-    }
-    
-    size_t count() const { return currentSize; }
-    
-    void emptyBox() {
-        currentSize = 0;
-    }
-    
-    double totalSpace() const {
-        double total = 0;
-        for (size_t k = 0; k < currentSize; k++) {
-            total += static_cast<double>(*stuffArray[k]);
-        }
-        return total;
-    }
-    
-    void showAll() const {
-        for (size_t k = 0; k < currentSize; k++) {
-            std::cout << "Thing " << k + 1 << ":\n";
-            std::cout << "  " << *stuffArray[k] << "\n";
-            std::cout << "  Middle: " << stuffArray[k]->middle() << "\n";
-            std::cout << "  Space: " << static_cast<double>(*stuffArray[k]) << "\n\n";
+    void display_all() const {
+        for (size_t i = 0; i < item_count; i++) {
+            std::cout << "Item " << i + 1 << ":\n";
+            std::cout << "  " << *items[i] << "\n";
+            std::cout << "  Center: " << items[i]->center_point() << "\n";
+            std::cout << "  Area: " << static_cast<double>(*items[i]) << "\n\n";
         }
     }
 };
 
 int main() {
-    std::cout << "=== PROGRAM FOR SHAPES ===\n";
-    std::cout << "=== FIVE, SIX, EIGHT CORNERS ===\n\n";
+    std::cout << "Program start\n";
+    std::cout << "Working with shapes\n\n";
     
-    try {
-        // Первая проверка
-        std::cout << "=== Check 1: Box with shapes ===\n";
-        Box<std::shared_ptr<BaseShape<double>>> myBox;
-        
-        // Кладем фигуры в коробку
-        myBox.putIn(std::make_shared<FiveCorner<double>>(0, 0, 5.0));
-        myBox.putIn(std::make_shared<SixCorner<double>>(2, 2, 3.0));
-        myBox.putIn(std::make_shared<EightCorner<double>>(-1, -1, 4.0));
-        
-        // Показываем что в коробке
-        myBox.showAll();
-        std::cout << "All space: " << myBox.totalSpace() << "\n\n";
-        
-        // Убираем одну фигуру
-        myBox.takeOut(1);
-        std::cout << "After taking out thing at index 1:\n";
-        myBox.showAll();
-        
-        // Вторая проверка
-        std::cout << "\n=== Check 2: SixCorner with int ===\n";
-        SixCorner<int> scInt(0, 0, 10);
-        std::cout << "SixCorner space: " << static_cast<double>(scInt) << "\n";
-        std::cout << "Middle: " << scInt.middle() << "\n";
-        scInt.showCorners(std::cout);
-        std::cout << "\n";
-        
-        // Третья проверка - ввод с клавиатуры
-        std::cout << "\n=== Check 3: Input FiveCorner ===\n";
-        std::cout << "Type middle_x middle_y size: ";
-        FiveCorner<double> fcInput;
-        std::cin >> fcInput;
-        std::cout << "FiveCorner space: " << static_cast<double>(fcInput) << "\n";
-        std::cout << "Middle: " << fcInput.middle() << "\n";
-        
-        // Четвертая проверка
-        std::cout << "\n=== Check 4: Box with SixCorner<float> ===\n";
-        Box<std::shared_ptr<SixCorner<float>>> floatBox;
-        floatBox.putIn(std::make_shared<SixCorner<float>>(0.0f, 0.0f, 2.0f));
-        floatBox.putIn(std::make_shared<SixCorner<float>>(1.0f, 1.0f, 1.5f));
-        
-        for (size_t k = 0; k < floatBox.count(); k++) {
-            std::cout << "SixCorner " << k + 1 << " space: " 
-                      << static_cast<double>(*floatBox.getThing(k)) << "\n";
-        }
-        
-    } catch (const std::exception& e) {
-        std::cerr << "Problem: " << e.what() << std::endl;
-        return 1;
+    // Часть 1
+    std::cout << "Part 1: Storage test\n";
+    Storage<std::shared_ptr<BaseFigura<double>>> store1;
+    
+    store1.add_item(std::make_shared<Figura5<double>>(0, 0, 5.0));
+    store1.add_item(std::make_shared<Figura6<double>>(2, 2, 3.0));
+    store1.add_item(std::make_shared<Figura8<double>>(-1, -1, 4.0));
+    
+    store1.display_all();
+    std::cout << "Total area: " << store1.total_area() << "\n\n";
+    
+    store1.remove_item(1);
+    std::cout << "After remove:\n";
+    store1.display_all();
+    
+    // Часть 2
+    std::cout << "\nPart 2: Figura6 with int\n";
+    Figura6<int> f6(0, 0, 10);
+    std::cout << "Area: " << static_cast<double>(f6) << "\n";
+    std::cout << "Center: " << f6.center_point() << "\n";
+    f6.show_dots(std::cout);
+    std::cout << "\n";
+    
+    // Часть 3
+    std::cout << "\nPart 3: Input Figura5\n";
+    std::cout << "Enter 3 numbers: ";
+    Figura5<double> f5_input;
+    std::cin >> f5_input;
+    std::cout << "Area: " << static_cast<double>(f5_input) << "\n";
+    std::cout << "Center: " << f5_input.center_point() << "\n";
+    
+    // Часть 4
+    std::cout << "\nPart 4: Float shapes\n";
+    Storage<std::shared_ptr<Figura6<float>>> store2;
+    store2.add_item(std::make_shared<Figura6<float>>(0.0f, 0.0f, 2.0f));
+    store2.add_item(std::make_shared<Figura6<float>>(1.0f, 1.0f, 1.5f));
+    
+    for (size_t i = 0; i < store2.size(); i++) {
+        std::cout << "Shape " << i + 1 << " area: " 
+                  << static_cast<double>(*store2.get_item(i)) << "\n";
     }
     
-    // Ждем нажатия
-    std::cout << "\nPress Enter to finish...";
+    std::cout << "\nPress Enter to end...";
     std::cin.ignore();
     std::cin.get();
-    
     return 0;
 }
